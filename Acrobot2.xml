@@ -1,0 +1,89 @@
+<mujoco model="acrobot">
+    <!--
+        Acrobot — double-pendulum with elbow actuation only
+        Parameters matched exactly to the Python notebook:
+          m1=0.134       l1=0.05  r1=0.046  I1=0.000277196
+          m2=0.064       l2=0.05  r2=0.048  I2=0.000147456
+          g=9.81  tl1=tl2=0.15 Nm  b1=0.0004  b2=0.0004
+          cf1=0.0030535619759663626  cf2=0.0007777171177173469
+          Ir=6.1e-06  gr=1.0
+    -->
+
+    <option timestep="0.001" gravity="0 0 -9.81" integrator="RK4"/>
+
+    <visual>
+        <headlight ambient="0.4 0.4 0.4" diffuse="0.8 0.8 0.8" specular="0.1 0.1 0.1"/>
+    </visual>
+
+    <worldbody>
+        <!-- Ground plane -->
+        <geom type="plane" size="1 1 0.1" rgba="0.85 0.85 0.85 1"/>
+
+        <!-- Fixed pivot — small dark sphere to mark the base -->
+        <site name="pivot" pos="0 0 0.3" size="0.008"/>
+        <geom type="sphere" pos="0 0 0.3" size="0.008" rgba="0.15 0.15 0.15 1"/>
+
+        <!--
+            LINK 1
+            Length  l1 = 0.05 m  → fromto 0→-0.05 along Z
+            Mass    m1 = 0.134 kg
+            CoM     r1 = 0.046 m from shoulder joint  → pos = 0 0 -0.046
+            Inertia I1 = 0.000277196 kg·m²  (about CoM)
+            Damping b1 = 0.0004
+            Friction cf1 = 0.0030535619759663626
+        -->
+        <body name="link1" pos="0 0 0.3">
+            <joint name="shoulder" type="hinge" axis="0 1 0" pos="0 0 0"
+                   damping="0.0004" frictionloss="0.0030535619759663626"/>
+            <inertial pos="0 0 -0.046"
+                      mass="0.134"
+                      diaginertia="0.000277196
+                                   0.000277196
+                                   0.00005"/>
+            <!-- Link 1 rod — dark gray -->
+            <geom type="capsule" fromto="0 0 0 0 0 -0.05"
+                  size="0.005" rgba="0.25 0.25 0.25 1"/>
+            <!-- Sphere at elbow end of link 1 — light gray -->
+            <geom type="sphere" pos="0 0 -0.05"
+                  size="0.009" rgba="0.65 0.65 0.65 1"/>
+
+            <!--
+                LINK 2
+                Length  l2 = 0.05 m  → fromto 0→-0.05 along Z
+                Mass    m2 = 0.064 kg
+                CoM     r2 = 0.048 m from elbow
+                Inertia I2 = 0.000147456 kg·m²
+                Damping b2 = 0.0004
+                Friction cf2 = 0.0007777171177173469
+                Torque limit tl2 = 0.15 Nm  (elbow actuated)
+            -->
+            <body name="link2" pos="0 0 -0.05">
+                <joint name="elbow" type="hinge" axis="0 1 0" pos="0 0 0"
+                       damping="0.0004"
+                       frictionloss="0.0007777171177173469"/>
+                <inertial pos="0 0 -0.048"
+                          mass="0.064"
+                          diaginertia="0.000147456
+                                       0.000147456
+                                       0.00002"/>
+                <!-- Link 2 rod — charcoal -->
+                <geom type="capsule" fromto="0 0 0 0 0 -0.05"
+                      size="0.005" rgba="0.15 0.15 0.15 1"/>
+                <!-- Sphere at tip of link 2 — medium gray -->
+                <geom type="sphere" pos="0 0 -0.05"
+                      size="0.009" rgba="0.50 0.50 0.50 1"/>
+            </body>
+        </body>
+    </worldbody>
+
+    <actuator>
+        <!--
+            Elbow only (acrobot = underactuated).
+            ctrlrange matches max_torque = 0.15 Nm used in Python.
+            gear=1 → no mechanical advantage.
+        -->
+        <motor name="elbow_motor" joint="elbow" gear="1"
+               ctrllimited="true" ctrlrange="-0.15 0.15"/>
+    </actuator>
+
+</mujoco>
