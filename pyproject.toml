@@ -1,0 +1,14 @@
+[project]
+name = "mini-project"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "ipython>=9.13.0",
+    "matplotlib>=3.10.9",
+    "mujoco>=3.8.1",
+    "numpy>=2.4.4",
+    "optuna>=4.8.0",
+    "optuna-dashboard>=0.20.0",
+]
