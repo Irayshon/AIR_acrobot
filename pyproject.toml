@@ -11,4 +11,6 @@ dependencies = [
     "numpy>=2.4.4",
     "optuna>=4.8.0",
     "optuna-dashboard>=0.20.0",
+    "pydrake>=0.2.1",
+    "underactuated>=2026.1.2",
 ]
